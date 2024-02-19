@@ -2,28 +2,34 @@ from pathlib import Path
 import shutil
 
 def save_files(from_dir:Path, to_dir:Path):
+    try:
     
-    # if directory exists, doesn't raise the exception or create new directory
-   to_dir.mkdir(parents=True, exist_ok=True)
-   
-   for file_path in from_dir.iterdir():
+            # if directory exists, doesn't raise the exception or create new directory
+        to_dir.mkdir(parents=True, exist_ok=True)
         
-        # check if it's file, not directory
-        if file_path.is_file():
-            
-            extension = file_path.suffix
-            
-            # create subdirectory path
-            subdirectory_path = to_dir / extension.replace('.', '')
-            subdirectory_path.mkdir(parents=True, exist_ok=True)
-                
-            # copy files to correct directories
-            destination_path = subdirectory_path / file_path.name
-            shutil.copy2(file_path, destination_path)
-            
-        # check each file inside subdirectory
-        else:
-            save_files(file_path, to_dir)
+        for file_path in from_dir.iterdir():
+                try:
+                    # check if it's file, not directory
+                    if file_path.is_file():
+                        
+                        extension = file_path.suffix
+                        
+                        # create subdirectory path
+                        subdirectory_path = to_dir / extension.replace('.', '')
+                        subdirectory_path.mkdir(parents=True, exist_ok=True)
+                            
+                        # copy files to correct directories
+                        destination_path = subdirectory_path / file_path.name
+                        shutil.copy2(file_path, destination_path)
+                        
+                    # check each file inside subdirectory
+                    else:
+                        save_files(file_path, to_dir)
+                except (PermissionError, FileNotFoundError) as e:
+                    print(f"Error processing file {file_path}: {e}")
+    except (PermissionError, FileNotFoundError) as e:
+        print(f"Error accessing destination directory {to_dir}: {e}")
+                    
             
     
 def parse_input(user_input):
